@@ -1,0 +1,31 @@
+FROM node:lts
+
+# java
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+RUN apt-get update &&\
+    apt-get install -y build-essential openjdk-8-jre openjdk-8-jdk gradle
+
+# ionic, cordoba
+ARG IONIC_VERSION=6.12.2
+ENV IONIC_VERSION=${IONIC_VERSION}
+
+RUN npm install -g cordova @ionic/cli@${IONIC_VERSION}
+
+# android
+ENV ANDROID_HOME=/usr/local/android-sdk-linux
+ARG ANDROID_SDK_VERSION="3859397"
+ENV ANDROID_BUILD_TOOLS_VERSION=26.0.2
+#ENV ANDROID_API_LEVELS=android-29    
+
+RUN mkdir -p ${ANDROID_HOME} &&\
+    curl -fSLk https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_VERSION}.zip -o sdk-tools-linux-${ANDROID_SDK_VERSION}.zip &&\
+    unzip sdk-tools-linux-${ANDROID_SDK_VERSION}.zip -d ${ANDROID_HOME}
+
+RUN mkdir ~/.android && echo '### User Sources for Android SDK Manager' > ~/.android/repositories.cfg
+
+RUN echo y | $ANDROID_HOME/tools/bin/sdkmanager --licenses &&\
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" &&\
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+
+WORKDIR /app

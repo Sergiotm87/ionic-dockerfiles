@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+
+  builder:
+    image: emergya/ionic-builder:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile.base
+
+  ionic:
+    image: emergya/ionic-app:latest
+    ports:
+      - 80:80
+    build:
+      #context to remote public repo
+      #build: https://github.com/ionic/app.git
+      # change context and dockerfile path!
+      context: ./src/helloworld
+      dockerfile: ../../Dockerfile.app
+      #args:
+      #  ENV: ${ENV-production}
